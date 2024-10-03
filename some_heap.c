@@ -7,12 +7,20 @@
 #define KEY_NOT_PRESENT -1
 
 heap_t *heap_create(int capacity) {
+    heap_t* heap = (heap_t*)malloc(sizeof(heap_t));
+    heap->capacity = capacity;
+    heap->size = 0;
+    heap->data = (heap_node_t*)malloc(sizeof(heap_node_t) * capacity);
+    return heap;
 }
 
 void heap_free(heap_t *heap) {
+    free(heap);
 }
 
-unsigned int heap_size(heap_t *heap) { return heap->size; }
+unsigned int heap_size(heap_t *heap) {
+    return heap->size;
+}
 
 unsigned int heap_parent(unsigned int index) {
     if (index == 0) {
@@ -53,11 +61,30 @@ void heap_swap(heap_t *heap, int index1, int index2) {
 }
 
 void heap_bubble_up(heap_t *heap, int index) {
-    return;
+    if (index <= 0) {
+        return;
+    }
+
+    unsigned int parent = heap_parent(index);
+    while (parent > 0 && heap->data[index].value.as_int < parent) {
+        heap_swap(heap, parent, index);
+        index = parent;
+        parent = heap_parent(index);
+    }
 }
 
 void heap_bubble_down(heap_t *heap, int index) {
-    return;
+    while (index < (heap->size / 2)){
+        unsigned int left = heap_left_child(index);
+        unsigned int right = heap_right_child(index);
+
+        if (heap->data[left].value.as_int > heap->data[right].value.as_int) {
+            heap_swap(heap, right, index);
+        }
+        else {
+            heap_swap(heap, left, index);
+        }
+    }
 }
 
 void heap_insert(heap_t *heap, heap_key_t key, heap_value_t data) {
